@@ -23,7 +23,7 @@ steps:
       terraform --version
     displayName: 'Install Terraform'
 
-  - checkout: self  
+  - checkout: self
 
   - script: |
       echo "Initializing Terraform..."
@@ -31,14 +31,13 @@ steps:
 
       echo "Running Terraform Plan..."
       terraform plan \
-        -var "admin_password=$(admin_password)"\
-      -var "admin_username=$(admin_username)" 
+        -var="admin_username=$(admin_username)" \
+        -var="admin_password=$(admin_password)"
     displayName: 'Terraform Init & Plan'
 
   - script: |
       echo "Applying Terraform..."
       terraform apply -auto-approve \
-        -var "admin_password=$(admin_password)"\
-      -var "admin_username=$(admin_username)" 
+        -var="admin_username=$(admin_username)" \
+        -var="admin_password=$(admin_password)"
     displayName: 'Terraform Apply'
-
