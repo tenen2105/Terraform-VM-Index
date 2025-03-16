@@ -9,23 +9,36 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
+variables:
+  terraformVersion: '1.5.0'
+  azureServiceConnection: 'Terraform-Connection-AZ305'
+
 steps:
-- task: TerraformInstaller@1
-  inputs:
-    terraformVersion: 'latest'
+  - script: |
+      echo "Installing Terraform..."
+      sudo apt-get update && sudo apt-get install -y unzip
+      curl -fsSL https://releases.hashicorp.com/terraform/$(terraformVersion)/terraform_$(terraformVersion)_linux_amd64.zip -o terraform.zip
+      unzip terraform.zip
+      sudo mv terraform /usr/local/bin/
+      terraform --version
+    displayName: 'Install Terraform'
 
-- script: terraform init
-  displayName: 'Terraform Init'
+  - checkout: self  
 
-- script: |
-    terraform plan \
-      -var "admin_password=$(admin_password)"\
+  - script: |
+      echo "Initializing Terraform..."
+      terraform init
+
+      echo "Running Terraform Plan..."
+      terraform plan \
+        -var "admin_password=$(admin_password)"\
       -var "admin_username=$(admin_username)" 
-  displayName: 'Terraform Plan'
+    displayName: 'Terraform Init & Plan'
 
-- script: |
-    terraform apply -auto-approve \
-      -var "admin_password=$(admin_password)"\
+  - script: |
+      echo "Applying Terraform..."
+      terraform apply -auto-approve \
+        -var "admin_password=$(admin_password)"\
       -var "admin_username=$(admin_username)" 
-  displayName: 'Terraform Apply'
+    displayName: 'Terraform Apply'
 
